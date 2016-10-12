@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/assets">
+        <file alias="appicon">icons/appicon.ico</file>
+        <file>icons/add.png</file>
+        <file>icons/calendar.png</file>
+        <file>icons/delete.png</file>
+        <file>icons/ok.png</file>
+        <file>icons/save.png</file>
+        <file>icons/user.png</file>
+        <file>icons/return.png</file>
+    </qresource>
+</RCC>
