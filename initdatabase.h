@@ -8,17 +8,11 @@
 #include <QSqlTableModel>
 #include <QDir>
 
-//! [0]
-static bool createConnection()
-{
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(QDir::currentPath() + "/hilohane.db");
-    if (!db.open()) {
-        QMessageBox::critical(0, "Veritabanı Hatası","Bağlantı sağlanamadı !", QMessageBox::Cancel);
-        return false;
-    }
-    return true;
-}
-//! [0]
+class initDatabase{
+public:
+    initDatabase();
+    bool createConnection();
+    QSqlDatabase db;
+};
 
 #endif // INITDATABASE_H

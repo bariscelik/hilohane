@@ -1,6 +1,5 @@
 #include "home.h"
 #include "ui_home.h"
-#include "initdatabase.h"
 #include <QModelIndex>
 #include <QDir>
 #include <QDateTime>
@@ -15,13 +14,13 @@ Home::Home(QWidget *parent) :
     ui->setupUi(this);
 
     connect(&ar, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
+    connect(&er, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
+    connect(&er, SIGNAL(accepted()), this, SLOT(updateReturnedModel()), Qt::QueuedConnection);
 
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->resizeColumnsToContents();
 
 
-
-    createConnection();
 
     updateModel();
     updateReturnedModel();
@@ -36,7 +35,12 @@ Home::Home(QWidget *parent) :
     ui->tableView->setColumnHidden(0,true);
     ui->tableView->resizeColumnsToContents();
 
-    ui->iadeTableView->setModel(returnedModel);
+    QSortFilterProxyModel *rm=new QSortFilterProxyModel(this);
+    rm->setDynamicSortFilter(true);
+    rm->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    rm->setSourceModel(returnedModel);
+
+    ui->iadeTableView->setModel(rm);
     ui->iadeTableView->setColumnHidden(0,true);
     ui->iadeTableView->resizeColumnsToContents();
 }
@@ -228,4 +232,16 @@ void Home::on_tabWidget_currentChanged(int index)
         ui->action_iade->setText("İade Et");
         ui->action_iade->setIcon(QIcon(":/assets/icons/ok.png"));
     }
+}
+
+void Home::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    er.setRecordId(model->index(index.row(), 0).data().toInt());
+    er.show();
+}
+
+void Home::on_iadeTableView_doubleClicked(const QModelIndex &index)
+{
+    er.setRecordId(returnedModel->index(index.row(), 0).data().toInt());
+    er.show();
 }

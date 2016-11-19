@@ -2,10 +2,14 @@
 #define STUDENTS_H
 
 #include <QDialog>
-
+#include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlTableModel>
+#include <QDir>
 #include "ui_addstudent.h"
 #include "ui_recordsbystudent.h"
-#include "initdatabase.h"
 
 namespace Ui {
 class students;

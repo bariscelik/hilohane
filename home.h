@@ -9,6 +9,7 @@
 #include <QSqlTableModel>
 #include <QIdentityProxyModel>
 #include "addrecord.h"
+#include "editrecord.h"
 #include "students.h"
 
 class MyModel : public QIdentityProxyModel
@@ -42,6 +43,7 @@ public:
 
 public slots:
     void updateModel();
+    void updateReturnedModel();
 private slots:
     void on_actionAdd_triggered();
     void on_actionDelete_triggered();
@@ -50,15 +52,19 @@ private slots:
     void on_actionExport_triggered();
     void on_tabWidget_currentChanged(int index);
 
+    void on_tableView_doubleClicked(const QModelIndex &index);
+
+    void on_iadeTableView_doubleClicked(const QModelIndex &index);
+
 private:
     QString getLastExecutedQuery(const QSqlQuery& query);
     Ui::Home *ui;
     addRecord ar;
+    editRecord er;
     students st;
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQueryModel *returnedModel = new QSqlQueryModel();
     MyModel *mymodel=new MyModel();
-    void updateReturnedModel();
     bool iadetab = false;
 };
 

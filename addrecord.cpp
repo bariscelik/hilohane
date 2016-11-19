@@ -16,7 +16,6 @@ addRecord::addRecord(QWidget *parent) :
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Ekle");
     ui->sayfaSayisiLineEdit->setValidator(new QIntValidator(0, 100000, this));
 
-    createConnection();
 
     connect(&st, SIGNAL(finished(int)), this, SLOT(updateModel()));
     connect(this, SIGNAL(finished(int)), this, SLOT(updateModel()), Qt::QueuedConnection);

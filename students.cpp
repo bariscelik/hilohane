@@ -8,8 +8,6 @@ students::students(QWidget *parent) :
     ui->setupUi(this);
 
 
-    createConnection();
-
     updateModel();
 
     ui->tableView->setModel(model);
@@ -54,7 +52,12 @@ void students::on_pushButton_clicked()
         item.bindValue(":name", adstui.isimLineEdit->text());
         item.bindValue(":number", adstui.okulNumarasiLineEdit->text());
         item.bindValue(":class", adstui.sinifLineEdit->text());
-        item.exec();
+
+        if(!item.exec()){
+            QMessageBox msgbx(QMessageBox::Critical, "Mevcut Kayıt", "Muhtemelen zaten mevcut olan bir <b>öğrenci no</b> ile kayıt etmeyi denediniz<br><br>Hata: " + item.lastError().text());
+            msgbx.exec();
+        }
+
         updateModel();
     });
 
