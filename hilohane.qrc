@@ -8,5 +8,6 @@
         <file>icons/save.png</file>
         <file>icons/user.png</file>
         <file>icons/return.png</file>
+        <file>icons/cat.png</file>
     </qresource>
 </RCC>

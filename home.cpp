@@ -3,9 +3,12 @@
 #include <QModelIndex>
 #include <QDir>
 #include <QDateTime>
-#include <QSortFilterProxyModel>
+#include <QDateTimeEdit>
 #include "xlsxdocument.h"
 #include <QFileDialog>
+#include "hiloheaderview.h"
+#include <QTextCodec>
+
 
 Home::Home(QWidget *parent) :
     QMainWindow(parent),
@@ -13,36 +16,233 @@ Home::Home(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // ************************ //
+    // **** CONNECT EVENTS **** //
+    // ************************ //
     connect(&ar, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
     connect(&er, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
     connect(&er, SIGNAL(accepted()), this, SLOT(updateReturnedModel()), Qt::QueuedConnection);
+    connect(&tl, SIGNAL(updateModel()), this, SLOT(updateModel()), Qt::QueuedConnection);
+    connect(&tl, SIGNAL(updateModel()), this, SLOT(updateReturnedModel()), Qt::QueuedConnection);
+
+    // **************************** //
+    // **** BOOKS TABLE HEADER **** //
+    // **************************** //
+    HiloHeaderView *myHeader = new HiloHeaderView(Qt::Horizontal, ui->tableView);
+
+    QLineEdit *filterStudentName = new QLineEdit(myHeader);
+    QLineEdit *filterBook = new QLineEdit(myHeader);
+    QLineEdit *filterClass = new QLineEdit(myHeader);
+    QLineEdit *filterPageNumber = new QLineEdit(myHeader);
+
+
+    filterStudentName->setClearButtonEnabled(true);
+    filterBook->setClearButtonEnabled(true);
+    filterClass->setClearButtonEnabled(true);
+    filterPageNumber->setClearButtonEnabled(true);
+
+
+    filterClass->setInputMask("9->A");
+    QRegExp rx("(|>|<|\\.|[0-9]){30}");
+    filterPageNumber->setValidator(new QRegExpValidator(rx, this));
+
+
+    QHBoxLayout *deliveryDateRange = new QHBoxLayout;
+    QHBoxLayout *maxReturnDateRange = new QHBoxLayout;
+
+    deliveryDateRange->setContentsMargins(0,0,0,0);
+    maxReturnDateRange->setContentsMargins(0,0,0,0);
+
+    QDateTimeEdit *filterDeliveryDateStart = new QDateTimeEdit();
+    filterDeliveryDateStart->setCalendarPopup(true);
+
+    QDateTimeEdit *filterDeliveryDateEnd = new QDateTimeEdit();
+    filterDeliveryDateEnd->setCalendarPopup(true);
+    filterDeliveryDateEnd->setDateTime(QDateTime::currentDateTime());
+
+    deliveryDateRange->addWidget(filterDeliveryDateStart);
+    deliveryDateRange->addWidget(filterDeliveryDateEnd);
+
+    QDateTimeEdit *filterMaxReturnDateStart = new QDateTimeEdit();
+    filterMaxReturnDateStart->setCalendarPopup(true);
+
+    QDateTimeEdit *filterMaxReturnDateEnd = new QDateTimeEdit();
+    filterMaxReturnDateEnd->setCalendarPopup(true);
+    filterMaxReturnDateEnd->setDateTime(QDateTime::currentDateTime());
+
+    maxReturnDateRange->addWidget(filterMaxReturnDateStart);
+    maxReturnDateRange->addWidget(filterMaxReturnDateEnd);
+
+
+
+    QGroupBox *deliveryGroup = new QGroupBox(myHeader);
+    deliveryGroup->setLayout(deliveryDateRange);
+    deliveryGroup->setContentsMargins(0,0,0,0);
+
+    QGroupBox *returnGroup = new QGroupBox(myHeader);
+    returnGroup->setLayout(maxReturnDateRange);
+    returnGroup->setContentsMargins(0,0,0,0);
+
+    myHeader->widgetList[0] = filterStudentName;
+    myHeader->widgetList[1] = filterBook;
+    myHeader->widgetList[2] = filterClass;
+    myHeader->widgetList[3] = filterPageNumber;
+    myHeader->widgetList[4] = deliveryGroup;
+    myHeader->widgetList[5] = returnGroup;
+
+    ui->tableView->setHorizontalHeader(myHeader);
+
+    connect(filterStudentName, &QLineEdit::textChanged, [=](const QString &text) {
+        m->setRegExpFilter(1, QRegExp(text));
+    });
+
+    connect(filterBook, &QLineEdit::textChanged, [=](const QString &text) {
+        m->setRegExpFilter(2, QRegExp(text));
+    });
+
+    connect(filterClass, &QLineEdit::textChanged, [=](const QString &text) {
+        m->setRegExpFilter(3, QRegExp(text));
+    });
+
+    connect(filterPageNumber, &QLineEdit::textChanged, [=](const QString &text) {
+        m->setNumberFilter(4, text);
+    });
+
+    connect(filterDeliveryDateStart, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        m->setDateRangeFilter(5, date.date(), filterDeliveryDateEnd->date());
+    });
+
+    connect(filterDeliveryDateEnd, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        m->setDateRangeFilter(5, filterDeliveryDateStart->date(), date.date());
+    });
+
+    connect(filterMaxReturnDateStart, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        m->setDateRangeFilter(6, date.date(), filterMaxReturnDateEnd->date());
+    });
+
+    connect(filterMaxReturnDateEnd, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        m->setDateRangeFilter(6, filterMaxReturnDateStart->date(), date.date());
+    });
+
+    // ******************************* //
+    // **** RETURNED TABLE HEADER **** //
+    // ******************************* //
+    HiloHeaderView *myHeaderR = new HiloHeaderView(Qt::Horizontal, ui->returnedBooksTableView);
+
+    QLineEdit *filterStudentNameR = new QLineEdit(myHeaderR);
+    QLineEdit *filterBookR = new QLineEdit(myHeaderR);
+    QLineEdit *filterClassR = new QLineEdit(myHeaderR);
+    QLineEdit *filterPageNumberR = new QLineEdit(myHeaderR);
+
+
+    filterStudentNameR->setClearButtonEnabled(true);
+    filterBookR->setClearButtonEnabled(true);
+    filterClassR->setClearButtonEnabled(true);
+    filterPageNumberR->setClearButtonEnabled(true);
+
+
+    filterClassR->setInputMask("9->A");
+    QRegExp rxR("(|>|<|\\.|[0-9]){30}");
+    filterPageNumberR->setValidator(new QRegExpValidator(rxR, this));
+
+
+
+    QHBoxLayout *deliveryDateRangeR = new QHBoxLayout;
+    QHBoxLayout *maxReturnDateRangeR = new QHBoxLayout;
+
+    deliveryDateRangeR->setContentsMargins(0,0,0,0);
+    maxReturnDateRangeR->setContentsMargins(0,0,0,0);
+
+    QDateTimeEdit *filterDeliveryDateStartR = new QDateTimeEdit();
+    filterDeliveryDateStartR->setCalendarPopup(true);
+
+    QDateTimeEdit *filterDeliveryDateEndR = new QDateTimeEdit();
+    filterDeliveryDateEndR->setCalendarPopup(true);
+    filterDeliveryDateEndR->setDateTime(QDateTime::currentDateTime());
+
+    deliveryDateRangeR->addWidget(filterDeliveryDateStartR);
+    deliveryDateRangeR->addWidget(filterDeliveryDateEndR);
+
+    QDateTimeEdit *filterMaxReturnDateStartR = new QDateTimeEdit();
+    filterMaxReturnDateStartR->setCalendarPopup(true);
+
+    QDateTimeEdit *filterMaxReturnDateEndR = new QDateTimeEdit();
+    filterMaxReturnDateEndR->setCalendarPopup(true);
+    filterMaxReturnDateEndR->setDateTime(QDateTime::currentDateTime());
+
+    maxReturnDateRangeR->addWidget(filterMaxReturnDateStartR);
+    maxReturnDateRangeR->addWidget(filterMaxReturnDateEndR);
+
+    QGroupBox *deliveryGroupR = new QGroupBox(myHeaderR);
+    deliveryGroupR->setLayout(deliveryDateRangeR);
+    deliveryGroupR->setContentsMargins(0,0,0,0);
+
+    QGroupBox *returnGroupR = new QGroupBox(myHeaderR);
+    returnGroupR->setLayout(maxReturnDateRangeR);
+    returnGroupR->setContentsMargins(0,0,0,0);
+
+    myHeaderR->widgetList[0] = filterStudentNameR;
+    myHeaderR->widgetList[1] = filterBookR;
+    myHeaderR->widgetList[2] = filterClassR;
+    myHeaderR->widgetList[3] = filterPageNumberR;
+    myHeaderR->widgetList[4] = deliveryGroupR;
+    myHeaderR->widgetList[5] = returnGroupR;
+
+    ui->returnedBooksTableView->setHorizontalHeader(myHeaderR);
+
+    connect(filterStudentNameR, &QLineEdit::textChanged, [=](const QString &text) {
+        rm->setRegExpFilter(1, QRegExp(text));
+    });
+
+    connect(filterBookR, &QLineEdit::textChanged, [=](const QString &text) {
+        rm->setRegExpFilter(2, QRegExp(text));
+    });
+
+    connect(filterClassR, &QLineEdit::textChanged, [=](const QString &text) {
+        rm->setRegExpFilter(3, QRegExp(text));
+    });
+
+    connect(filterPageNumberR, &QLineEdit::textChanged, [=](const QString &text) {
+        rm->setNumberFilter(4, text);
+    });
+
+    connect(filterDeliveryDateStartR, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        rm->setDateRangeFilter(5, date.date(), filterDeliveryDateEndR->date());
+    });
+
+    connect(filterDeliveryDateEndR, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        rm->setDateRangeFilter(5, filterDeliveryDateStartR->date(), date.date());
+    });
+
+    connect(filterMaxReturnDateStartR, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        rm->setDateRangeFilter(6, date.date(), filterMaxReturnDateEndR->date());
+    });
+
+    connect(filterMaxReturnDateEndR, &QDateTimeEdit::dateTimeChanged, [=](const QDateTime &date) {
+        rm->setDateRangeFilter(6, filterMaxReturnDateStartR->date(), date.date());
+    });
 
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->resizeColumnsToContents();
-
-
 
     updateModel();
     updateReturnedModel();
     mymodel->setSourceModel(model);
 
-    QSortFilterProxyModel *m=new QSortFilterProxyModel(this);
-    m->setDynamicSortFilter(true);
+
     m->setFilterCaseSensitivity(Qt::CaseInsensitive);
     m->setSourceModel(mymodel);
+
+    rm->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    rm->setSourceModel(returnedModel);
 
     ui->tableView->setModel(m);
     ui->tableView->setColumnHidden(0,true);
     ui->tableView->resizeColumnsToContents();
 
-    QSortFilterProxyModel *rm=new QSortFilterProxyModel(this);
-    rm->setDynamicSortFilter(true);
-    rm->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    rm->setSourceModel(returnedModel);
-
-    ui->iadeTableView->setModel(rm);
-    ui->iadeTableView->setColumnHidden(0,true);
-    ui->iadeTableView->resizeColumnsToContents();
+    ui->returnedBooksTableView->setModel(rm);
+    ui->returnedBooksTableView->setColumnHidden(0,true);
+    ui->returnedBooksTableView->resizeColumnsToContents();
 }
 
 Home::~Home()
@@ -57,7 +257,9 @@ void Home::updateModel()
 
     model->setQuery(query);
     model->dataChanged(QModelIndex(),QModelIndex());
+
     ui->tableView->update();
+
 }
 
 void Home::updateReturnedModel()
@@ -67,27 +269,28 @@ void Home::updateReturnedModel()
 
     returnedModel->setQuery(query);
     returnedModel->dataChanged(QModelIndex(),QModelIndex());
-    ui->iadeTableView->update();
+    ui->returnedBooksTableView->update();
 }
 
 
-void Home::on_actionAdd_triggered()
+void Home::on_action_add_triggered()
 {
     ar.show();
     ar.update();
 }
 
-void Home::on_actionDelete_triggered()
+void Home::on_action_delete_triggered()
 {
     QModelIndexList selection;
 
     if(iadetab)
     {
-        selection = ui->iadeTableView->selectionModel()->selectedRows();
+        selection = ui->returnedBooksTableView->selectionModel()->selectedRows();
     }else{
         selection = ui->tableView->selectionModel()->selectedRows();
     }
 
+    // delete confirmation name list
     QStringList list;
     QStringList nameList;
 
@@ -96,9 +299,9 @@ void Home::on_actionDelete_triggered()
         list << selection.at(i).data().toString();
         if(iadetab)
         {
-            nameList << returnedModel->index(selection.at(i).row(), 1).data().toString() + " - " + returnedModel->index(selection.at(i).row(), 2).data().toString();
+            nameList << rm->index(selection.at(i).row(), 1).data().toString() + " - " + rm->index(selection.at(i).row(), 2).data().toString();
         }else{
-            nameList << model->index(selection.at(i).row(), 1).data().toString() + " - " + model->index(selection.at(i).row(), 2).data().toString();
+            nameList << m->index(selection.at(i).row(), 1).data().toString() + " - " + m->index(selection.at(i).row(), 2).data().toString();
         }
     }
 
@@ -120,29 +323,29 @@ void Home::on_actionDelete_triggered()
 
 QString Home::getLastExecutedQuery(const QSqlQuery& query)
 {
- QString str = query.lastQuery();
- QMapIterator<QString, QVariant> it(query.boundValues());
- while (it.hasNext())
- {
-  it.next();
-  str.replace(it.key(),it.value().toString());
- }
- return str;
+    QString str = query.lastQuery();
+    QMapIterator<QString, QVariant> it(query.boundValues());
+    while (it.hasNext())
+    {
+        it.next();
+        str.replace(it.key(),it.value().toString());
+    }
+    return str;
 }
 
-void Home::on_action_ogrenciler_triggered()
+void Home::on_action_students_triggered()
 {
     st.show();
 }
 
-void Home::on_action_iade_triggered()
+void Home::on_action_return_triggered()
 {
     QStringList list;
     QModelIndexList selection;
     QString str = "'" + QDateTime::currentDateTime().toString() + "'";
     if(iadetab)
     {
-        selection = ui->iadeTableView->selectionModel()->selectedRows();
+        selection = ui->returnedBooksTableView->selectionModel()->selectedRows();
 
         for(int i=0; i< selection.count(); i++)
         {
@@ -161,87 +364,150 @@ void Home::on_action_iade_triggered()
     }
 
     if(list.size() > 0){
-            QSqlQuery("UPDATE books SET return_date = " + str + " WHERE id IN(" + list.join(", ") + ")");
-            updateModel();
-            updateReturnedModel();
+        QSqlQuery("UPDATE books SET return_date = " + str + " WHERE id IN(" + list.join(", ") + ")");
+        updateModel();
+        updateReturnedModel();
     }
 }
 
-void Home::on_actionExport_triggered()
+// TODO: setColumnWidth fonksiyonuna auto width özelliği eklenecek
+void Home::on_action_export_triggered()
 {
+    const int colCount = mymodel->columnCount();
+    const int rowCount = mymodel->rowCount();
+    size_t *maxChar = new size_t[colCount]();
+
+    QString s;
+
     QXlsx::Document exportXls;
     QXlsx::Format bold;
     bold.setFontBold(true);
 
+    QXlsx::Format bordered;
+    bordered.setBorderStyle(QXlsx::Format::BorderThin);
+
     exportXls.addSheet("Ödünç Verilenler");
 
-    int colCount = mymodel->columnCount();
-    int rowCount = mymodel->rowCount();
+    /*exportXls.mergeCells(QXlsx::CellRange(1,1,1,colCount));
+
+    exportXls.write(1, 1, "ÖDÜNÇ ALINAN KİTAPLAR");*/
 
     for(int i=0; i<colCount; i++)
     {
-        exportXls.write(1, i+1, mymodel->headerData(i, Qt::Horizontal).value<QString>(), bold);
+        s = mymodel->headerData(i, Qt::Horizontal).value<QString>();
+
+        if(s.length() > maxChar[i])
+            maxChar[i] = s.length();
+
+        exportXls.write(1, i+1, s, bold);
     }
 
     for(int i=0; i<rowCount; i++)
     {
         for(int j=0; j<colCount; j++)
         {
-            exportXls.write(i+2, j+1, mymodel->index(i,j).data().toString());
+            s = mymodel->index(i,j).data().toString();
+
+            if(s.length() > maxChar[j])
+                maxChar[j] = s.size();
+
+            exportXls.write(i+2, j+1, s,bordered);
         }
     }
 
+    for(int i=0; i<colCount; i++)
+        exportXls.setColumnWidth(i+1, maxChar[i]+3);
+
+
     exportXls.addSheet("İade Edilenler");
 
-    int rcolCount = returnedModel->columnCount();
-    int rrowCount = returnedModel->rowCount();
+    const int rcolCount = returnedModel->columnCount();
+    const int rrowCount = returnedModel->rowCount();
+
+    size_t *maxChar2 = new size_t[rcolCount]();
+
 
     for(int i=0; i<rcolCount; i++)
     {
-        exportXls.write(1, i+1, returnedModel->headerData(i, Qt::Horizontal).value<QString>(), bold);
+        s = returnedModel->headerData(i, Qt::Horizontal).value<QString>();
+
+        if(s.length() > maxChar2[i])
+            maxChar2[i] = s.length();
+
+        exportXls.write(1, i+1, s, bold);
     }
 
     for(int i=0; i<rrowCount; i++)
     {
         for(int j=0; j<rcolCount; j++)
         {
-            exportXls.write(i+2, j+1, returnedModel->index(i,j).data().toString());
+            s = returnedModel->index(i,j).data().toString();
+
+            if(s.length() > maxChar2[j])
+                maxChar2[j] = s.size();
+            exportXls.write(i+2, j+1, s,bordered);
         }
     }
+
+    for(int i=0; i<colCount; i++)
+        exportXls.setColumnWidth(i+1, maxChar2[i]+3);
+
+
     QFileDialog fldlg;
     fldlg.setDefaultSuffix("xlsx");
 
-    QString filename = fldlg.getSaveFileName(this, "Dışarıya Aktar", "hilohane.xlsx", "Excel Dosyası (*.xlsx)");
+    QString filename = fldlg.getSaveFileName(this, "Dışarıya Aktar", "hilohane_kitaplar(" + QDate::currentDate().toString(Qt::ISODate) +  ").xlsx", "Excel Dosyası (*.xlsx)");
 
 
     if(!filename.isEmpty())
     {
-        exportXls.saveAs(filename);
+        if(exportXls.saveAs(filename))
+        {
+#ifdef __linux__
+            filename = "xdg-open \"" + filename + "\"";
+#elif _WIN32
+            filename = "START \""+ filename + "\"";
+#endif
+            system(filename.toStdString().c_str());
+        }
+
     }
 
 }
 
 void Home::on_tabWidget_currentChanged(int index)
 {
-    if(index == 1){
-        iadetab=true;
-        ui->action_iade->setText("Geri Al");
-        ui->action_iade->setIcon(QIcon(":/assets/icons/return.png"));
-    }else{
+    switch (index) {
+
+    // on loan books tab
+    case 0:
         iadetab = false;
-        ui->action_iade->setText("İade Et");
-        ui->action_iade->setIcon(QIcon(":/assets/icons/ok.png"));
+        ui->action_return->setText("İade Et");
+        ui->action_return->setIcon(QIcon(":/assets/icons/ok.png"));
+        break;
+
+        // returned books tab
+    case 1:
+        iadetab=true;
+        ui->action_return->setText("Geri Al");
+        ui->action_return->setIcon(QIcon(":/assets/icons/return.png"));
+        break;
     }
 }
 
 void Home::on_tableView_doubleClicked(const QModelIndex &index)
 {
-    er.setRecordId(model->index(index.row(), 0).data().toInt());
+    er.setRecordId(m->index(index.row(), 0).data().toInt());
     er.show();
 }
 
-void Home::on_iadeTableView_doubleClicked(const QModelIndex &index)
+void Home::on_returnedBooksTableView_doubleClicked(const QModelIndex &index)
 {
-    er.setRecordId(returnedModel->index(index.row(), 0).data().toInt());
+    er.setRecordId(rm->index(index.row(), 0).data().toInt());
     er.show();
+}
+
+void Home::on_actionTools_triggered()
+{
+    tl.show();
 }

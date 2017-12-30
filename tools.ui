@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>tools</class>
+ <widget class="QDialog" name="tools">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>254</width>
+    <height>131</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Araçlar</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="hilohane.qrc">
+    <normaloff>:/assets/icons/cat.png</normaloff>:/assets/icons/cat.png</iconset>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QToolButton" name="deleteAllBookDataBtn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>20</y>
+     <width>191</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TÜM KİTAP VERİSİNİ SİL</string>
+   </property>
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/delete.png</normaloff>:/assets/icons/delete.png</iconset>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="incrementNumSpbx">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>80</y>
+     <width>48</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-100</number>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="increaseClassNumberBtn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>80</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>SINIF EKLE</string>
+   </property>
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/ok.png</normaloff>:/assets/icons/ok.png</iconset>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="hilohane.qrc"/>
+ </resources>
+ <connections/>
+</ui>

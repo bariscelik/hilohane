@@ -5,6 +5,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include "initdatabase.h"
+#include <QDebug>
 
 addRecord::addRecord(QWidget *parent) :
     QDialog(parent),
@@ -74,6 +75,7 @@ void addRecord::on_buttonBox_accepted()
     item.bindValue(":si", ui->OgrenciComboBox->currentData().toInt());
     item.bindValue(":pg", ui->sayfaSayisiLineEdit->text().toInt());
     item.exec();
+
 }
 
 void addRecord::on_pushButton_clicked()

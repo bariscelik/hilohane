@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>905</width>
-    <height>423</height>
+    <width>950</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,11 +18,11 @@
     <normaloff>:/assets/appicon</normaloff>:/assets/appicon</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -58,6 +58,9 @@
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>true</bool>
           </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
          </widget>
         </item>
        </layout>
@@ -83,7 +86,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QTableView" name="iadeTableView">
+         <widget class="QTableView" name="returnedBooksTableView">
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectRows</enum>
           </property>
@@ -92,6 +95,9 @@
           </property>
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
           </attribute>
          </widget>
         </item>
@@ -106,8 +112,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>905</width>
-     <height>19</height>
+     <width>950</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -127,15 +133,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAdd"/>
-   <addaction name="actionDelete"/>
-   <addaction name="action_ogrenciler"/>
+   <addaction name="action_add"/>
+   <addaction name="action_delete"/>
+   <addaction name="action_students"/>
    <addaction name="separator"/>
-   <addaction name="action_iade"/>
-   <addaction name="actionExport"/>
+   <addaction name="action_return"/>
+   <addaction name="action_export"/>
+   <addaction name="actionTools"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionAdd">
+  <action name="action_add">
    <property name="icon">
     <iconset resource="hilohane.qrc">
      <normaloff>:/assets/icons/add.png</normaloff>:/assets/icons/add.png</iconset>
@@ -150,7 +157,7 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionDelete">
+  <action name="action_delete">
    <property name="icon">
     <iconset resource="hilohane.qrc">
      <normaloff>:/assets/icons/delete.png</normaloff>:/assets/icons/delete.png</iconset>
@@ -165,7 +172,7 @@
     <string>Del</string>
    </property>
   </action>
-  <action name="action_ogrenciler">
+  <action name="action_students">
    <property name="icon">
     <iconset resource="hilohane.qrc">
      <normaloff>:/assets/icons/user.png</normaloff>:/assets/icons/user.png</iconset>
@@ -174,7 +181,7 @@
     <string>Öğrenciler</string>
    </property>
   </action>
-  <action name="action_iade">
+  <action name="action_return">
    <property name="icon">
     <iconset resource="hilohane.qrc">
      <normaloff>:/assets/icons/ok.png</normaloff>:/assets/icons/ok.png</iconset>
@@ -186,7 +193,7 @@
     <string>Return</string>
    </property>
   </action>
-  <action name="actionExport">
+  <action name="action_export">
    <property name="icon">
     <iconset resource="hilohane.qrc">
      <normaloff>:/assets/icons/save.png</normaloff>:/assets/icons/save.png</iconset>
@@ -199,6 +206,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionTools">
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/cat.png</normaloff>:/assets/icons/cat.png</iconset>
+   </property>
+   <property name="text">
+    <string>Araçlar</string>
+   </property>
+   <property name="toolTip">
+    <string>Araçlar</string>
    </property>
   </action>
  </widget>

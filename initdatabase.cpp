@@ -1,9 +1,6 @@
 #include "initdatabase.h"
 
-initDatabase::initDatabase()
-{
-
-}
+initDatabase::initDatabase(){}
 
 bool initDatabase::createConnection()
 {

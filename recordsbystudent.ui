@@ -22,11 +22,18 @@
      <property name="title">
       <string>Öğrenci Bilgileri</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="studentInfoLabel">
         <property name="text">
          <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnExportStudentRecords">
+        <property name="text">
+         <string>DIŞARIYA AKTAR</string>
         </property>
        </widget>
       </item>

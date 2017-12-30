@@ -23,12 +23,16 @@ public:
     explicit students(QWidget *parent = 0);
     ~students();
 
+public slots:
+    void exportBtnClicked();
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
     void updateModel();
 
     void on_tableView_doubleClicked(const QModelIndex &index);
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::students *ui;
@@ -38,6 +42,8 @@ private:
     QSqlQueryModel *recordsModel = new QSqlQueryModel();
     void showEvent(QShowEvent *e);
     void updateRecordsModel(int student_id, QString student_name);
+
+    QString studentName;
 };
 
 #endif // STUDENTS_H

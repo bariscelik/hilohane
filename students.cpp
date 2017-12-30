@@ -1,6 +1,10 @@
 #include "students.h"
 #include "ui_students.h"
 
+#include <QDate>
+#include <QFileDialog>
+#include <xlsxdocument.h>
+
 students::students(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::students)
@@ -95,8 +99,12 @@ void students::on_tableView_doubleClicked(const QModelIndex &index)
     QDialog *rbs = new QDialog;
     rbsui.setupUi(rbs);
 
+    studentName = model->index(index.row(), 1).data().toString();
+
+    rbs->connect(rbsui.btnExportStudentRecords, SIGNAL(clicked()), this, SLOT(exportBtnClicked()));
+
     rbsui.tableView->setModel(recordsModel);
-    updateRecordsModel(model->index(index.row(), 0).data().toInt(), model->index(index.row(), 1).data().toString());
+    updateRecordsModel(model->index(index.row(), 0).data().toInt(), studentName);
     rbsui.tableView->setColumnHidden(0,true);
     rbsui.tableView->resizeColumnsToContents();
     rbs->show();
@@ -115,4 +123,144 @@ void students::updateRecordsModel(int student_id, QString student_name)
     recordsModel->setQuery(booksQuery);
     recordsModel->dataChanged(QModelIndex(),QModelIndex());
     rbsui.tableView->update();
+}
+
+void students::on_pushButton_3_clicked()
+{
+    const int colCount = model->columnCount();
+    const int rowCount = model->rowCount();
+    size_t *maxChar = new size_t[colCount]();
+
+    QString s;
+
+    QXlsx::Document exportXls;
+    QXlsx::Format bold;
+    bold.setFontBold(true);
+
+    QXlsx::Format bordered;
+    bordered.setBorderStyle(QXlsx::Format::BorderThin);
+
+    exportXls.addSheet("Ödünç Verilenler");
+
+    /*exportXls.mergeCells(QXlsx::CellRange(1,1,1,colCount));
+
+    exportXls.write(1, 1, "ÖDÜNÇ ALINAN KİTAPLAR");*/
+
+    for(int i=0; i<colCount; i++)
+    {
+        s = model->headerData(i, Qt::Horizontal).value<QString>();
+
+        if(s.length() > maxChar[i])
+            maxChar[i] = s.length();
+
+        exportXls.write(1, i+1, s, bold);
+    }
+
+    for(int i=0; i<rowCount; i++)
+    {
+        for(int j=0; j<colCount; j++)
+        {
+            s = model->index(i,j).data().toString();
+
+            if(s.length() > maxChar[j])
+                maxChar[j] = s.size();
+
+            exportXls.write(i+2, j+1, s,bordered);
+        }
+    }
+
+    for(int i=0; i<colCount; i++)
+        exportXls.setColumnWidth(i+1, maxChar[i]+3);
+
+
+    QFileDialog fldlg;
+    fldlg.setDefaultSuffix("xlsx");
+
+    QString filename = fldlg.getSaveFileName(this, "Dışarıya Aktar", "hilohane_ogrenciler(" + QDate::currentDate().toString(Qt::ISODate) +  ").xlsx", "Excel Dosyası (*.xlsx)");
+
+
+    if(!filename.isEmpty())
+    {
+        if(exportXls.saveAs(filename))
+        {
+#ifdef __linux__
+            filename = "xdg-open \"" + filename + "\"";
+#elif _WIN32
+            filename = "START \""+ filename + "\"";
+#endif
+            system(filename.toStdString().c_str());
+        }
+
+    }
+}
+
+
+// single student report
+void students::exportBtnClicked()
+{
+    const int colCount = recordsModel->columnCount();
+    const int rowCount = recordsModel->rowCount();
+    size_t *maxChar = new size_t[colCount]();
+
+    QString s;
+
+    QXlsx::Document exportXls;
+    QXlsx::Format bold;
+    bold.setFontBold(true);
+
+    QXlsx::Format bordered;
+    bordered.setBorderStyle(QXlsx::Format::BorderThin);
+
+    exportXls.addSheet(studentName + " - Kütüphane Dökümü");
+
+    /*exportXls.mergeCells(QXlsx::CellRange(1,1,1,colCount));
+
+    exportXls.write(1, 1, "ÖDÜNÇ ALINAN KİTAPLAR");*/
+
+    for(int i=0; i<colCount; i++)
+    {
+        s = recordsModel->headerData(i, Qt::Horizontal).value<QString>();
+
+        if(s.length() > maxChar[i])
+            maxChar[i] = s.length();
+
+        exportXls.write(1, i+1, s, bold);
+    }
+
+    for(int i=0; i<rowCount; i++)
+    {
+        for(int j=0; j<colCount; j++)
+        {
+            s = recordsModel->index(i,j).data().toString();
+
+            if(s.length() > maxChar[j])
+                maxChar[j] = s.size();
+
+            exportXls.write(i+2, j+1, s,bordered);
+        }
+    }
+
+    for(int i=0; i<colCount; i++)
+        exportXls.setColumnWidth(i+1, maxChar[i]+3);
+
+
+    QFileDialog fldlg;
+    fldlg.setDefaultSuffix("xlsx");
+
+    QString filename = fldlg.getSaveFileName(this, "Dışarıya Aktar", studentName + "(" + QDate::currentDate().toString(Qt::ISODate) +  ").xlsx", "Excel Dosyası (*.xlsx)");
+
+
+    if(!filename.isEmpty())
+    {
+        if(exportXls.saveAs(filename))
+        {
+#ifdef __linux__
+            filename = "xdg-open \"" + filename + "\"";
+#elif _WIN32
+            filename = "START \""+ filename + "\"";
+#endif
+            system(filename.toStdString().c_str());
+        }
+
+    }
 }

@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-09-23T20:19:08
-#
-#-------------------------------------------------
-
 QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -12,36 +6,54 @@ TARGET = HiloHane
 TEMPLATE = app
 CONFIG += c++11
 
-install_db.path = %{buildDir}
-install_db.files += %{sourceDir}/hilohane.db
+install_db.files = hilohane.db
+install_db.path  = $$OUT_PWD
 
 INSTALLS += install_db
 
 
-include(/home/baris/Projeler/qtLibraries/QtXlsxWriter/src/xlsx/qtxlsx.pri)
+win32{
+    include(C:/qt_projects/qtLibraries/QtXlsxWriter/src/xlsx/qtxlsx.pri)
+} else {
+    include(/home/baris/Projeler/qtLibraries/QtXlsxWriter/src/xlsx/qtxlsx.pri)
+}
 
-SOURCES += main.cpp\
-        home.cpp \
-    addrecord.cpp \
-    students.cpp \
-    initdatabase.cpp \
-    editrecord.cpp
+
+SOURCES +=  main.cpp\
+            home.cpp \
+            addrecord.cpp \
+            students.cpp \
+            initdatabase.cpp \
+            editrecord.cpp \
+            multiplefiltermodel.cpp \
+    tools.cpp
 
 HEADERS  += home.h \
-    initdatabase.h \
-    addrecord.h \
-    students.h \
-    editrecord.h
+            initdatabase.h \
+            addrecord.h \
+            students.h \
+            editrecord.h \
+            hiloheaderview.h \
+            multiplefiltermodel.h \
+    tools.h
 
 FORMS    += home.ui \
     addrecord.ui \
     editrecord.ui \
     students.ui \
     addstudent.ui \
-    recordsbystudent.ui
+    recordsbystudent.ui \
+    tools.ui
 
 DISTFILES += \
     hilohane.db
 
 RESOURCES += \
     hilohane.qrc
+
+
+
+
+
+
+
