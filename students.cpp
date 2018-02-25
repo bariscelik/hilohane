@@ -118,7 +118,7 @@ void students::updateRecordsModel()
     QSqlQuery studentsQuery("SELECT name, number, class FROM students WHERE id =" + QString::number(currentStudentID) + " LIMIT 1");
     if (studentsQuery.lastError().isValid()) QMessageBox::critical(0,"Error",studentsQuery.lastError().text() );
     studentsQuery.first();
-    rbsui.studentInfoLabel->setText("<b>Adı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(0).toString() + "<br><b>Numarası&nbsp;:</b> " + studentsQuery.value(1).toString() + "<br><b>Sınıfı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(2).toString());
+    rbsui.studentInfoLabel->setText("<b>Adı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(0).toString() + "<br><b>Numarası&nbsp;:</b> " + studentsQuery.value(1).toString() + "<br><b>Sınıfı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(2).toString());
     QSqlQuery booksQuery("SELECT id as '#ID', book_title as 'Kitap Adı', page as 'Sayfa Sayısı', strftime('%d.%m.%Y %H:%M', datetime(books.delivery_date, 'unixepoch')) as 'Veriliş Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.max_return_date, 'unixepoch')) as 'Son İade Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.return_date, 'unixepoch')) as 'İade Tarihi' FROM books WHERE books.student_id =" + QString::number(currentStudentID));
     if (booksQuery.lastError().isValid()) QMessageBox::critical(0,"Error",booksQuery.lastError().text() );
 
@@ -201,17 +201,31 @@ void students::exportBtnClicked()
 
     exportXls.write(1, 1, "ÖDÜNÇ ALINAN KİTAPLAR");*/
 
+    QSqlQuery studentsQuery("SELECT name, number, class FROM students WHERE id =" + QString::number(currentStudentID) + " LIMIT 1");
+    if (studentsQuery.lastError().isValid()) QMessageBox::critical(0,"Error",studentsQuery.lastError().text() );
+    studentsQuery.first();
+
+    exportXls.write(1, 1, "Adı", bold);
+    exportXls.write(1, 2, studentsQuery.value(0).toString());
+
+    exportXls.write(2, 1, "Sınıfı", bold);
+    exportXls.write(2, 2, studentsQuery.value(2).toString());
+
+    exportXls.write(3, 1, "Numarası", bold);
+    exportXls.write(3, 2, studentsQuery.value(1).toString());
+
+
     for(int i=0; i<colCount; i++)
     {
 
-        exportXls.write(1, i+1, recordsModel->headerData(i, Qt::Horizontal).toString(), bold);
+        exportXls.write(4, i+1, recordsModel->headerData(i, Qt::Horizontal).toString(), bold);
     }
 
     for(int i=0; i<rowCount; i++)
     {
         for(int j=0; j<colCount; j++)
         {
-            exportXls.write(i+2, j+1, recordsModel->index(i,j).data().toString(),bordered);
+            exportXls.write(i+5, j+1, recordsModel->index(i,j).data().toString(),bordered);
         }
     }
 
