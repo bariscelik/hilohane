@@ -31,6 +31,7 @@ private:
     Ui::editRecord *ui;
     students st;
     int recordId = 0;
+    bool isActive = false;
 };
 
 

@@ -26,7 +26,8 @@ SOURCES +=  main.cpp\
             initdatabase.cpp \
             editrecord.cpp \
             multiplefiltermodel.cpp \
-    tools.cpp
+    tools.cpp \
+    returnform.cpp
 
 HEADERS  += home.h \
             initdatabase.h \
@@ -35,7 +36,9 @@ HEADERS  += home.h \
             editrecord.h \
             hiloheaderview.h \
             multiplefiltermodel.h \
-    tools.h
+    tools.h \
+    coloredsqlquerymodel.h \
+    returnform.h
 
 FORMS    += home.ui \
     addrecord.ui \
@@ -43,7 +46,8 @@ FORMS    += home.ui \
     students.ui \
     addstudent.ui \
     recordsbystudent.ui \
-    tools.ui
+    tools.ui \
+    returnform.ui
 
 DISTFILES += \
     hilohane.db

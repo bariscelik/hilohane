@@ -31,11 +31,22 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnExportStudentRecords">
-        <property name="text">
-         <string>DIŞARIYA AKTAR</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QPushButton" name="editStudent">
+          <property name="text">
+           <string>DÜZENLE</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnExportStudentRecords">
+          <property name="text">
+           <string>DIŞARIYA AKTAR</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

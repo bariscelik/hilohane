@@ -14,23 +14,8 @@
 #include "students.h"
 #include "tools.h"
 #include "multiplefiltermodel.h"
-
-class MyModel : public QIdentityProxyModel
-{
-    QColor calculateColorForRow(int row) const {
-
-    }
-
-    QVariant data(const QModelIndex &index, int role)
-    {
-        qDebug("deneyaa");
-        if (role == Qt::BackgroundRole) {
-           return QVariant(QColor(Qt::blue));
-        }
-
-        return QIdentityProxyModel::data(index, role);
-    }
-};
+#include "coloredsqlquerymodel.h"
+#include "returnform.h"
 
 namespace Ui {
 class Home;
@@ -55,25 +40,30 @@ private slots:
     void on_action_export_triggered();
     void on_tabWidget_currentChanged(int index);
 
-    void on_tableView_doubleClicked(const QModelIndex &index);
-
+    void on_activeBooksTableView_doubleClicked(const QModelIndex &index);
     void on_returnedBooksTableView_doubleClicked(const QModelIndex &index);
 
     void on_actionTools_triggered();
+    void updateStatusBar();
+
+    void on_action_return_with_date_triggered();
 
 private:
     QString getLastExecutedQuery(const QSqlQuery& query);
+    QLabel *sBarTableInfo; // status bar table info
+    QLabel *sBarSelected; // status bar selected items info
     Ui::Home *ui;
     addRecord ar;
     editRecord er;
+    ReturnForm rf;
     students st;
     tools tl;
-    QSqlQueryModel *model = new QSqlQueryModel();// model of on loan books
-    QSqlQueryModel *returnedModel = new QSqlQueryModel();// model of returned books
-    MyModel *mymodel=new MyModel();
+    ColoredSqlQueryModel *model = new ColoredSqlQueryModel();// model of on loan books
+    ColoredSqlQueryModel *returnedModel = new ColoredSqlQueryModel();// model of returned books
     MultipleFilterModel *m = new MultipleFilterModel(this);  // proxy model of on loan books for sorting
     MultipleFilterModel *rm = new MultipleFilterModel(this); // proxy model of returned books for sorting
     bool iadetab = false;
+    void updateHighlights();
 };
 
 #endif // HOME_H

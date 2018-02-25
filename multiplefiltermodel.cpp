@@ -1,10 +1,13 @@
 #include "multiplefiltermodel.h"
+#include <QBrush>
 #include <QDebug>
+#include <QSqlQueryModel>
 
 MultipleFilterModel::MultipleFilterModel(QObject *parent){}
 
 void MultipleFilterModel::setDateRangeFilter(qint32 col, const QDate& minDate, const QDate& maxDate, qint32 role)
 {
+    qDebug() << minDate;
     if (minDate.isNull() && maxDate.isNull())
         return removeFilterFromColumn(col,role);
     m_regExpFilter.remove((static_cast<qint64>(col) << 32) | static_cast<qint64>(role));
@@ -80,7 +83,7 @@ bool MultipleFilterModel::filterAcceptsRow(int source_row, const QModelIndex & s
 
         for (auto dateRngIter = m_dateRangeFilter.constBegin(); dateRngIter != m_dateRangeFilter.constEnd(); ++dateRngIter) {
             if (static_cast<qint32>(dateRngIter.key() >> 32) == i) {
-                const QDate testDate = QDateTime::fromString(currntIndex.data(static_cast<qint32>(dateRngIter.key() & ((static_cast<qint64>(1) << 32) - 1))).toString()).date();
+                const QDate testDate = QDateTime::fromString(currntIndex.data(static_cast<qint32>(dateRngIter.key() & ((static_cast<qint64>(1) << 32) - 1))).toString(), "dd.MM.yyyy HH:mm").date();
                 if (!((testDate >= dateRngIter.value().first || dateRngIter.value().first.isNull()) && (testDate <= dateRngIter.value().second || dateRngIter.value().second.isNull())))
                     return false;
             }

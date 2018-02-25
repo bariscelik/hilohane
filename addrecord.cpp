@@ -31,14 +31,17 @@ addRecord::~addRecord()
 
 void addRecord::updateModel()
 {
-    QStringList* list = new QStringList();
+    QStringList* bookList = new QStringList();
+    QStringList *bookPageList = new QStringList();
+
     QSqlQuery books;
 
-    if(books.exec("SELECT book_title FROM books GROUP BY book_title"))
+    if(books.exec("SELECT book_title, page FROM books GROUP BY book_title"))
     {
         while(books.next())
         {
-            list->append(books.value(0).toString());
+            bookList->append(books.value(0).toString());
+            bookPageList->append(books.value(1).toString());
         }
     }
 
@@ -53,29 +56,31 @@ void addRecord::updateModel()
         }
     }
 
-        QCompleter* completer = new QCompleter(*list);
-        completer->setCaseSensitivity(Qt::CaseInsensitive);
-        ui->bookLineEdit->setCompleter(completer);
-        ui->bookLineEdit->clear();
-        ui->sayfaSayisiLineEdit->clear();
-        ui->deliveryDateEdit->setDateTime(QDateTime::currentDateTime());
-        ui->sonIadeTarihiDateTimeEdit->setDateTime(QDateTime::currentDateTime().addDays(7));
+    QCompleter* completer = new QCompleter(*bookList);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    connect(completer, QOverload<const QString &>::of(&QCompleter::activated),
+        [=](const QString &s){ ui->sayfaSayisiLineEdit->setText(bookPageList->at(bookList->indexOf(s))); });
+
+
+    ui->bookLineEdit->setCompleter(completer);
+    ui->bookLineEdit->clear();
+    ui->sayfaSayisiLineEdit->clear();
+    ui->deliveryDateEdit->setDateTime(QDateTime::currentDateTime());
+    ui->sonIadeTarihiDateTimeEdit->setDateTime(QDateTime::currentDateTime().addDays(7));
 }
 
 void addRecord::on_buttonBox_accepted()
 {
     QSqlQuery item;
 
-    item.prepare("INSERT INTO books (book_title, delivery_date, max_return_date, return_date, student_id, page)"
-                 "VALUES (:bt, :dd, :mrd, :rd, :si, :pg)");
-    item.bindValue(":bt", ui->bookLineEdit->text());
-    item.bindValue(":dd", ui->deliveryDateEdit->dateTime().toString());
-    item.bindValue(":mrd", ui->sonIadeTarihiDateTimeEdit->dateTime().toString());
-    item.bindValue(":rd", ui->deliveryDateEdit->dateTime().toString());
+    item.prepare("INSERT INTO books (book_title, delivery_date, max_return_date, student_id, page)"
+                 "VALUES (:bt, :dd, :mrd, :si, :pg)");
+    item.bindValue(":bt", ui->bookLineEdit->text().trimmed());
+    item.bindValue(":dd", ui->deliveryDateEdit->dateTime().toSecsSinceEpoch());
+    item.bindValue(":mrd", ui->sonIadeTarihiDateTimeEdit->dateTime().toSecsSinceEpoch());
     item.bindValue(":si", ui->OgrenciComboBox->currentData().toInt());
     item.bindValue(":pg", ui->sayfaSayisiLineEdit->text().toInt());
     item.exec();
-
 }
 
 void addRecord::on_pushButton_clicked()

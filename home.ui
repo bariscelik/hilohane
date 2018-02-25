@@ -45,7 +45,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QTableView" name="tableView">
+         <widget class="QTableView" name="activeBooksTableView">
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
@@ -54,6 +54,9 @@
           </property>
           <property name="sortingEnabled">
            <bool>true</bool>
+          </property>
+          <property name="cornerButtonEnabled">
+           <bool>false</bool>
           </property>
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>true</bool>
@@ -138,6 +141,7 @@
    <addaction name="action_students"/>
    <addaction name="separator"/>
    <addaction name="action_return"/>
+   <addaction name="action_return_with_date"/>
    <addaction name="action_export"/>
    <addaction name="actionTools"/>
   </widget>
@@ -218,6 +222,15 @@
    </property>
    <property name="toolTip">
     <string>Araçlar</string>
+   </property>
+  </action>
+  <action name="action_return_with_date">
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/calendar.png</normaloff>:/assets/icons/calendar.png</iconset>
+   </property>
+   <property name="text">
+    <string>Tarihle İade Et</string>
    </property>
   </action>
  </widget>

@@ -53,7 +53,7 @@ void students::on_pushButton_clicked()
         QSqlQuery item;
         item.prepare("INSERT INTO students (name, number, class)"
                      "VALUES (:name, :number, :class)");
-        item.bindValue(":name", adstui.isimLineEdit->text());
+        item.bindValue(":name", adstui.isimLineEdit->text().trimmed());
         item.bindValue(":number", adstui.okulNumarasiLineEdit->text());
         item.bindValue(":class", adstui.sinifLineEdit->text());
 
@@ -102,22 +102,24 @@ void students::on_tableView_doubleClicked(const QModelIndex &index)
     studentName = model->index(index.row(), 1).data().toString();
 
     rbs->connect(rbsui.btnExportStudentRecords, SIGNAL(clicked()), this, SLOT(exportBtnClicked()));
+    rbs->connect(rbsui.editStudent, SIGNAL(clicked()), this, SLOT(editStudentClicked()));
+
+    currentStudentID = model->index(index.row(), 0).data().toInt();
 
     rbsui.tableView->setModel(recordsModel);
-    updateRecordsModel(model->index(index.row(), 0).data().toInt(), studentName);
+    updateRecordsModel();
     rbsui.tableView->setColumnHidden(0,true);
     rbsui.tableView->resizeColumnsToContents();
     rbs->show();
-
 }
 
-void students::updateRecordsModel(int student_id, QString student_name)
+void students::updateRecordsModel()
 {
-    QSqlQuery studentsQuery("SELECT name, number, class FROM students WHERE id =" + QString::number(student_id) + " LIMIT 1");
+    QSqlQuery studentsQuery("SELECT name, number, class FROM students WHERE id =" + QString::number(currentStudentID) + " LIMIT 1");
     if (studentsQuery.lastError().isValid()) QMessageBox::critical(0,"Error",studentsQuery.lastError().text() );
     studentsQuery.first();
-    rbsui.studentInfoLabel->setText("<b>Adı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(0).toString() + "<br><b>Numarası&nbsp;:</b> " + studentsQuery.value(1).toString() + "<br><b>Sınıfı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(2).toString());
-    QSqlQuery booksQuery("SELECT id as '#ID', book_title as 'Kitap Adı', page as 'Sayfa Sayısı', delivery_date as 'Veriliş Tarihi', max_return_date as 'Son İade Tarihi' FROM books WHERE books.student_id =" + QString::number(student_id));
+    rbsui.studentInfoLabel->setText("<b>Adı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(0).toString() + "<br><b>Numarası&nbsp;:</b> " + studentsQuery.value(1).toString() + "<br><b>Sınıfı&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</b> " + studentsQuery.value(2).toString());
+    QSqlQuery booksQuery("SELECT id as '#ID', book_title as 'Kitap Adı', page as 'Sayfa Sayısı', strftime('%d.%m.%Y %H:%M', datetime(books.delivery_date, 'unixepoch')) as 'Veriliş Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.max_return_date, 'unixepoch')) as 'Son İade Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.return_date, 'unixepoch')) as 'İade Tarihi' FROM books WHERE books.student_id =" + QString::number(currentStudentID));
     if (booksQuery.lastError().isValid()) QMessageBox::critical(0,"Error",booksQuery.lastError().text() );
 
     recordsModel->setQuery(booksQuery);
@@ -129,9 +131,6 @@ void students::on_pushButton_3_clicked()
 {
     const int colCount = model->columnCount();
     const int rowCount = model->rowCount();
-    size_t *maxChar = new size_t[colCount]();
-
-    QString s;
 
     QXlsx::Document exportXls;
     QXlsx::Format bold;
@@ -148,30 +147,18 @@ void students::on_pushButton_3_clicked()
 
     for(int i=0; i<colCount; i++)
     {
-        s = model->headerData(i, Qt::Horizontal).value<QString>();
-
-        if(s.length() > maxChar[i])
-            maxChar[i] = s.length();
-
-        exportXls.write(1, i+1, s, bold);
+        exportXls.write(1, i+1, model->headerData(i, Qt::Horizontal).toString(), bold);
     }
 
     for(int i=0; i<rowCount; i++)
     {
         for(int j=0; j<colCount; j++)
         {
-            s = model->index(i,j).data().toString();
-
-            if(s.length() > maxChar[j])
-                maxChar[j] = s.size();
-
-            exportXls.write(i+2, j+1, s,bordered);
+            exportXls.write(i+2, j+1, model->index(i,j).data().toString(),bordered);
         }
     }
 
-    for(int i=0; i<colCount; i++)
-        exportXls.setColumnWidth(i+1, maxChar[i]+3);
-
+    exportXls.currentWorksheet()->setAutoColumnWidth(1, colCount,rowCount);
 
     QFileDialog fldlg;
     fldlg.setDefaultSuffix("xlsx");
@@ -200,9 +187,6 @@ void students::exportBtnClicked()
 {
     const int colCount = recordsModel->columnCount();
     const int rowCount = recordsModel->rowCount();
-    size_t *maxChar = new size_t[colCount]();
-
-    QString s;
 
     QXlsx::Document exportXls;
     QXlsx::Format bold;
@@ -219,30 +203,19 @@ void students::exportBtnClicked()
 
     for(int i=0; i<colCount; i++)
     {
-        s = recordsModel->headerData(i, Qt::Horizontal).value<QString>();
 
-        if(s.length() > maxChar[i])
-            maxChar[i] = s.length();
-
-        exportXls.write(1, i+1, s, bold);
+        exportXls.write(1, i+1, recordsModel->headerData(i, Qt::Horizontal).toString(), bold);
     }
 
     for(int i=0; i<rowCount; i++)
     {
         for(int j=0; j<colCount; j++)
         {
-            s = recordsModel->index(i,j).data().toString();
-
-            if(s.length() > maxChar[j])
-                maxChar[j] = s.size();
-
-            exportXls.write(i+2, j+1, s,bordered);
+            exportXls.write(i+2, j+1, recordsModel->index(i,j).data().toString(),bordered);
         }
     }
 
-    for(int i=0; i<colCount; i++)
-        exportXls.setColumnWidth(i+1, maxChar[i]+3);
-
+    exportXls.currentWorksheet()->setAutoColumnWidth(1, colCount,rowCount);
 
     QFileDialog fldlg;
     fldlg.setDefaultSuffix("xlsx");
@@ -263,4 +236,50 @@ void students::exportBtnClicked()
         }
 
     }
+}
+
+void students::editStudentClicked()
+{
+    QDialog *adst = new QDialog;
+    adstui.setupUi(adst);
+
+    adst->layout()->setSizeConstraint( QLayout::SetFixedSize );
+    adstui.buttonBox->button(QDialogButtonBox::Cancel)->setText("Vazgeç");
+    adstui.buttonBox->button(QDialogButtonBox::Ok)->setText("Kaydet");
+
+    adstui.okulNumarasiLineEdit->setValidator(new QIntValidator(0, 1000, this));
+
+    QSqlQuery studentItem;
+
+    studentItem.prepare("SELECT name, number, class FROM students WHERE id=:id");
+    studentItem.bindValue(":id", currentStudentID);
+
+    if(studentItem.exec())
+    {
+        if(studentItem.first())
+        {
+            adstui.isimLineEdit->setText(studentItem.value(0).toString());
+            adstui.okulNumarasiLineEdit->setText(studentItem.value(1).toString());
+            adstui.sinifLineEdit->setText(studentItem.value(2).toString());
+        }
+    }
+
+    connect(adstui.buttonBox, &QDialogButtonBox::accepted, [=]() {
+        QSqlQuery item;
+        item.prepare("UPDATE students SET name=:name, number=:number, class=:class WHERE id=:id");
+        item.bindValue(":name", adstui.isimLineEdit->text().trimmed());
+        item.bindValue(":number", adstui.okulNumarasiLineEdit->text());
+        item.bindValue(":class", adstui.sinifLineEdit->text());
+        item.bindValue(":id", currentStudentID);
+
+        if(!item.exec()){
+            QMessageBox msgbx(QMessageBox::Critical, "Mevcut Kayıt", "Muhtemelen zaten mevcut olan bir <b>öğrenci no</b> ile kayıt etmeyi denediniz<br><br>Hata: " + item.lastError().text());
+            msgbx.exec();
+        }
+
+        updateModel();
+        updateRecordsModel();
+    });
+
+    adst->show();
 }

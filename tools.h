@@ -21,6 +21,8 @@ private slots:
 
     void on_increaseClassNumberBtn_clicked();
 
+    void on_migrateDbBtn_clicked();
+
 private:
     Ui::tools *ui;
 };

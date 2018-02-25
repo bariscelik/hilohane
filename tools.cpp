@@ -6,6 +6,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QDebug>
+#include <QDateTime>
 
 tools::tools(QWidget *parent) :
     QDialog(parent),
@@ -80,3 +81,31 @@ void tools::on_increaseClassNumberBtn_clicked()
 
 }
 
+
+void tools::on_migrateDbBtn_clicked()
+{
+    std::map<int,std::map<QString,int> > data;
+
+    QSqlQuery booksTable;
+    booksTable.exec("SELECT id,delivery_date,max_return_date,return_date FROM books");
+
+    while (booksTable.next()) {
+
+        const int id = booksTable.value(0).toInt();
+
+        data[id]["delivery_date"]   = QDateTime::fromString(booksTable.value(1).toString(), Qt::TextDate).toSecsSinceEpoch();
+        data[id]["max_return_date"] = QDateTime::fromString(booksTable.value(2).toString(), Qt::TextDate).toSecsSinceEpoch();
+        data[id]["return_date"]     = QDateTime::fromString(booksTable.value(3).toString(), Qt::TextDate).toSecsSinceEpoch();
+
+    }
+
+    for (const auto& kv : data) {
+        QSqlQuery saveQuery;
+        saveQuery.prepare("UPDATE books SET delivery_date = :dd, max_return_date = :mrd, return_date = :rd  WHERE id = :id");
+        saveQuery.bindValue(":id", kv.first);
+        saveQuery.bindValue(":dd", kv.second.at("delivery_date"));
+        saveQuery.bindValue(":mrd", kv.second.at("max_return_date"));
+        saveQuery.bindValue(":rd", kv.second.at("return_date"));
+        saveQuery.exec();
+    }
+}
