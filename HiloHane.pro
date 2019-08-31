@@ -1,4 +1,4 @@
-QT       += core gui sql
+QT       += core gui sql xml network printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,42 +12,44 @@ install_db.path  = $$OUT_PWD
 INSTALLS += install_db
 
 
-win32{
-    include(C:/qt_projects/qtLibraries/QtXlsxWriter/src/xlsx/qtxlsx.pri)
-} else {
-    include(/home/baris/Projeler/qtLibraries/QtXlsxWriter/src/xlsx/qtxlsx.pri)
-}
+include($$PWD/QtXlsxWriter/src/xlsx/qtxlsx.pri)
 
+LIBS += -lsqlite3
 
 SOURCES +=  main.cpp\
             home.cpp \
-            addrecord.cpp \
+    loandialog.cpp \
             students.cpp \
             initdatabase.cpp \
-            editrecord.cpp \
             multiplefiltermodel.cpp \
     tools.cpp \
-    returnform.cpp
+    returnform.cpp \
+    books.cpp \
+    bookdialog.cpp \
+    studentdialog.cpp
 
 HEADERS  += home.h \
             initdatabase.h \
-            addrecord.h \
+    loandialog.h \
             students.h \
-            editrecord.h \
             hiloheaderview.h \
             multiplefiltermodel.h \
     tools.h \
     coloredsqlquerymodel.h \
-    returnform.h
+    returnform.h \
+    books.h \
+    bookdialog.h \
+    studentdialog.h
 
 FORMS    += home.ui \
-    addrecord.ui \
-    editrecord.ui \
+    loandialog.ui \
     students.ui \
-    addstudent.ui \
     recordsbystudent.ui \
     tools.ui \
-    returnform.ui
+    returnform.ui \
+    books.ui \
+    bookdialog.ui \
+    studentdialog.ui
 
 DISTFILES += \
     hilohane.db

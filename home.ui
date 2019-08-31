@@ -110,16 +110,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>950</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="iconSize">
     <size>
@@ -136,26 +126,27 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_add"/>
+   <addaction name="action_to_lend"/>
    <addaction name="action_delete"/>
+   <addaction name="action_books"/>
    <addaction name="action_students"/>
    <addaction name="separator"/>
    <addaction name="action_return"/>
    <addaction name="action_return_with_date"/>
-   <addaction name="action_export"/>
-   <addaction name="actionTools"/>
+   <addaction name="action_settings"/>
+   <addaction name="action_about"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="action_add">
+  <action name="action_to_lend">
    <property name="icon">
     <iconset resource="hilohane.qrc">
-     <normaloff>:/assets/icons/add.png</normaloff>:/assets/icons/add.png</iconset>
+     <normaloff>:/assets/icons/box-out.png</normaloff>:/assets/icons/box-out.png</iconset>
    </property>
    <property name="text">
-    <string>Ekle</string>
+    <string>Ödünç Ver</string>
    </property>
    <property name="toolTip">
-    <string>Yeni kayıt ekle</string>
+    <string>Ödünç eser ver</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -188,7 +179,7 @@
   <action name="action_return">
    <property name="icon">
     <iconset resource="hilohane.qrc">
-     <normaloff>:/assets/icons/ok.png</normaloff>:/assets/icons/ok.png</iconset>
+     <normaloff>:/assets/icons/box-in.png</normaloff>:/assets/icons/box-in.png</iconset>
    </property>
    <property name="text">
     <string>İade Et</string>
@@ -200,7 +191,7 @@
   <action name="action_export">
    <property name="icon">
     <iconset resource="hilohane.qrc">
-     <normaloff>:/assets/icons/save.png</normaloff>:/assets/icons/save.png</iconset>
+     <normaloff>:/assets/icons/file-excel.png</normaloff>:/assets/icons/file-excel.png</iconset>
    </property>
    <property name="text">
     <string>Dışarı Aktar</string>
@@ -212,16 +203,16 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionTools">
+  <action name="action_settings">
    <property name="icon">
     <iconset resource="hilohane.qrc">
-     <normaloff>:/assets/icons/cat.png</normaloff>:/assets/icons/cat.png</iconset>
+     <normaloff>:/assets/icons/tag-alt.png</normaloff>:/assets/icons/tag-alt.png</iconset>
    </property>
    <property name="text">
-    <string>Araçlar</string>
+    <string>Ayarlar</string>
    </property>
    <property name="toolTip">
-    <string>Araçlar</string>
+    <string>Ayarlar / Araçlar</string>
    </property>
   </action>
   <action name="action_return_with_date">
@@ -231,6 +222,36 @@
    </property>
    <property name="text">
     <string>Tarihle İade Et</string>
+   </property>
+  </action>
+  <action name="action_books">
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/book.png</normaloff>:/assets/icons/book.png</iconset>
+   </property>
+   <property name="text">
+    <string>Eserler</string>
+   </property>
+   <property name="toolTip">
+    <string>Eserleri listele, ekle, düzenle, sil</string>
+   </property>
+  </action>
+  <action name="action_print_labels">
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/tag-alt.png</normaloff>:/assets/icons/tag-alt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Etikete Bastır</string>
+   </property>
+  </action>
+  <action name="action_about">
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/info.png</normaloff>:/assets/icons/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hakkında</string>
    </property>
   </action>
  </widget>

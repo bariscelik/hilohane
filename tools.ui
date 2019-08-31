@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>254</width>
-    <height>175</height>
+    <height>127</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,26 +71,6 @@
    <property name="icon">
     <iconset resource="hilohane.qrc">
      <normaloff>:/assets/icons/ok.png</normaloff>:/assets/icons/ok.png</iconset>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextBesideIcon</enum>
-   </property>
-  </widget>
-  <widget class="QToolButton" name="migrateDbBtn">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>130</y>
-     <width>191</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>VERİTABANINI UYARLA</string>
-   </property>
-   <property name="icon">
-    <iconset resource="hilohane.qrc">
-     <normaloff>:/assets/icons/cat.png</normaloff>:/assets/icons/cat.png</iconset>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextBesideIcon</enum>

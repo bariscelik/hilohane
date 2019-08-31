@@ -1,43 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>students</class>
- <widget class="QDialog" name="students">
-  <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
-  </property>
+ <class>Books</class>
+ <widget class="QDialog" name="Books">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>300</height>
+    <width>1057</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Öğrenciler</string>
+   <string>Eserler</string>
   </property>
   <property name="modal">
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="pushButton_studentDetail">
-       <property name="text">
-        <string>GÖRÜNTÜLE</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btn_add">
        <property name="text">
         <string>EKLE</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btn_del">
        <property name="text">
         <string>SİL</string>
        </property>
@@ -47,21 +37,31 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="btn_export">
        <property name="text">
         <string>DIŞARIYA AKTAR</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_printLabels">
+       <property name="text">
+        <string>SEÇİLİ ETİKETLERİ YAZDIR</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="tableView">
+    <widget class="QTableView" name="tblView_booksList">
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::DashLine</enum>
      </property>
      <property name="sortingEnabled">
       <bool>true</bool>

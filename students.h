@@ -8,7 +8,7 @@
 #include <QSqlQuery>
 #include <QSqlTableModel>
 #include <QDir>
-#include "ui_addstudent.h"
+#include <QSortFilterProxyModel>
 #include "ui_recordsbystudent.h"
 
 namespace Ui {
@@ -20,7 +20,7 @@ class students : public QDialog
     Q_OBJECT
 
 public:
-    explicit students(QWidget *parent = 0);
+    explicit students(QWidget *parent, int sc_id);
     ~students();
 private slots:
     void on_pushButton_clicked();
@@ -31,19 +31,21 @@ private slots:
 
     void on_pushButton_3_clicked();
     void exportBtnClicked();
-    void editStudentClicked();
+
+    void on_pushButton_studentDetail_clicked();
 
 private:
     Ui::students *ui;
-    Ui::addstudent adstui;
     Ui::recordsbystudent rbsui;
     QSqlQueryModel *model = new QSqlQueryModel();
+    QSortFilterProxyModel *pModel = new QSortFilterProxyModel();
     QSqlQueryModel *recordsModel = new QSqlQueryModel();
     void showEvent(QShowEvent *e);
     void updateRecordsModel();
 
     QString studentName;
     int currentStudentID = 0;
+    int schoolID;
 };
 
 #endif // STUDENTS_H

@@ -7,27 +7,49 @@
 #include "xlsxdocument.h"
 #include <QFileDialog>
 #include "hiloheaderview.h"
+#include "loandialog.h"
 #include <QTextCodec>
 #include <QSqlRecord>
 #include <QDebug>
 #include <QToolButton>
+#include <QInputDialog>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPagedPaintDevice>
+#include <QMenu>
 
 const static QString defaultDateFormat = "dd.MM.yyyy";
 const static QString defaultDateTimeFormat = "dd.MM.yyyy HH.mm";
 const static qint64  defaultTimeStamp   = 1451606400; // 01.01.2016 00.00
 
-Home::Home(QWidget *parent) :
+Home::Home(QWidget *parent, int scid) :
     QMainWindow(parent),
-    ui(new Ui::Home)
+    ui(new Ui::Home),
+    schoolID(scid)
 {
     ui->setupUi(this);
+
+    QToolButton *exportBtn = new QToolButton;
+    exportBtn->setIcon(QIcon(":/assets/icons/cloud-up.png"));
+    exportBtn->setPopupMode(QToolButton::InstantPopup);
+    exportBtn->setText("Dışarı Aktar");
+    exportBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+    QMenu *exportMenu = new QMenu();
+
+    exportMenu->addAction(ui->action_export);
+    exportMenu->addAction(ui->action_print_labels);
+
+    exportBtn->setMenu(exportMenu);
+
+    ui->mainToolBar->insertWidget(ui->action_settings,exportBtn);
+
 
     // ************************ //
     // **** CONNECT EVENTS **** //
     // ************************ //
-    connect(&ar, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
-    connect(&er, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
-    connect(&er, SIGNAL(accepted()), this, SLOT(updateReturnedModel()), Qt::QueuedConnection);
     connect(&rf, SIGNAL(accepted()), this, SLOT(updateModel()), Qt::QueuedConnection);
     connect(&rf, SIGNAL(accepted()), this, SLOT(updateReturnedModel()), Qt::QueuedConnection);
     connect(&tl, SIGNAL(updateModel()), this, SLOT(updateModel()), Qt::QueuedConnection);
@@ -249,9 +271,11 @@ Home::Home(QWidget *parent) :
     updateReturnedModel();
 
     m->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m->setSortLocaleAware(true);
     m->setSourceModel(model);
 
     rm->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    rm->setSortLocaleAware(true);
     rm->setSourceModel(returnedModel);
 
     ui->activeBooksTableView->setModel(m);
@@ -283,7 +307,11 @@ Home::~Home()
 
 void Home::updateModel()
 {
-    QSqlQuery query("SELECT books.id as '#ID', students.name as 'Öğrenci', books.book_title as 'Kitap Adı', students.class as 'Sınıfı', books.page as 'Sayfa Sayısı', strftime('%d.%m.%Y %H:%M', datetime(books.delivery_date, 'unixepoch')) as 'Veriliş Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.max_return_date, 'unixepoch')) as 'Son İade Tarihi', books.return_date as return_date_timestamp, books.max_return_date as max_return_date_timestamp FROM books LEFT OUTER JOIN students ON students.id = books.student_id WHERE books.return_date IS NULL");
+    QSqlQuery query;
+    query.prepare("SELECT loans.loanID as '#ID', students.name as 'Öğrenci', books.title as 'Kitap Adı', students.class as 'Sınıfı', books.page_number as 'Sayfa Sayısı', strftime('%d.%m.%Y %H:%M', datetime(loans.delivery_date, 'unixepoch')) as 'Veriliş Tarihi', strftime('%d.%m.%Y %H:%M', datetime(loans.max_return_date, 'unixepoch')) as 'Son İade Tarihi', loans.return_date as return_date_timestamp, loans.max_return_date as max_return_date_timestamp FROM loans LEFT OUTER JOIN students ON students.id = loans.student_id LEFT OUTER JOIN books ON books.bookID = loans.book_id WHERE loans.return_date IS NULL AND books.school_id = :sc_id");
+    query.bindValue(":sc_id", schoolID);
+    query.exec();
+
     if (query.lastError().isValid())
         QMessageBox::critical(0,"Hata",query.lastError().text() );
 
@@ -301,8 +329,13 @@ void Home::updateModel()
 
 void Home::updateReturnedModel()
 {
-    QSqlQuery query("SELECT books.id as '#ID', students.name as 'Öğrenci', books.book_title as 'Kitap Adı', students.class as 'Sınıfı', books.page as 'Sayfa Sayısı',  strftime('%d.%m.%Y %H:%M', datetime(books.delivery_date, 'unixepoch')) as 'Veriliş Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.max_return_date, 'unixepoch')) as 'Son İade Tarihi', strftime('%d.%m.%Y %H:%M', datetime(books.return_date, 'unixepoch')) as 'İade Tarihi', books.return_date as return_date_timestamp, books.max_return_date as max_return_date_timestamp FROM books LEFT OUTER JOIN students ON students.id = books.student_id WHERE books.return_date IS NOT NULL");
-    if (query.lastError().isValid()) QMessageBox::critical(0,"Hata",query.lastError().text() );
+    QSqlQuery query;
+    query.prepare("SELECT loans.loanID as '#ID', students.name as 'Öğrenci', books.title as 'Kitap Adı', students.class as 'Sınıfı', books.page_number as 'Sayfa Sayısı',  strftime('%d.%m.%Y %H:%M', datetime(loans.delivery_date, 'unixepoch')) as 'Veriliş Tarihi', strftime('%d.%m.%Y %H:%M', datetime(loans.max_return_date, 'unixepoch')) as 'Son İade Tarihi', strftime('%d.%m.%Y %H:%M', datetime(loans.return_date, 'unixepoch')) as 'İade Tarihi', loans.return_date as return_date_timestamp, loans.max_return_date as max_return_date_timestamp FROM loans LEFT OUTER JOIN students ON students.id = loans.student_id LEFT OUTER JOIN books ON books.bookID = loans.book_id WHERE loans.return_date IS NOT NULL AND books.school_id = :sc_id");
+    query.bindValue(":sc_id", schoolID);
+    query.exec();
+
+    if (query.lastError().isValid())
+        QMessageBox::critical(0,"Hata",query.lastError().text() );
 
     returnedModel->setQuery(query);
     //returnedModel->dataChanged(QModelIndex(),QModelIndex());
@@ -369,10 +402,12 @@ void Home::updateHighlights()
 }
 
 
-void Home::on_action_add_triggered()
+void Home::on_action_to_lend_triggered()
 {
-    ar.show();
-    ar.update();
+    LoanDialog ld(this, schoolID);
+
+    if(ld.exec() == QDialog::Accepted);
+        updateModel();
 }
 
 void Home::on_action_delete_triggered()
@@ -408,7 +443,7 @@ void Home::on_action_delete_triggered()
     if(list.size() > 0){
         if(QMessageBox::Yes == msgbox.exec())
         {
-            QSqlQuery("DELETE FROM books WHERE id IN(" + list.join(", ") + ")");
+            QSqlQuery("DELETE FROM loans WHERE loanID IN(" + list.join(", ") + ")");
             updateModel();
             updateReturnedModel();
         }else{
@@ -431,7 +466,8 @@ QString Home::getLastExecutedQuery(const QSqlQuery& query)
 
 void Home::on_action_students_triggered()
 {
-    st.show();
+    students st(this, schoolID);
+    st.exec();
 }
 
 void Home::on_action_return_triggered()
@@ -448,7 +484,7 @@ void Home::on_action_return_triggered()
             list << selection.at(i).data().toString();
         }
 
-        str = "delivery_date";
+        str = "null";
 
     }else{
         selection = ui->activeBooksTableView->selectionModel()->selectedRows();
@@ -460,7 +496,7 @@ void Home::on_action_return_triggered()
     }
 
     if(list.size() > 0){
-        QSqlQuery("UPDATE books SET return_date = " + str + " WHERE id IN(" + list.join(", ") + ")");
+        QSqlQuery("UPDATE loans SET return_date = " + str + " WHERE loanID IN(" + list.join(", ") + ")");
         updateModel();
         updateReturnedModel();
     }
@@ -486,39 +522,26 @@ void Home::on_action_export_triggered()
     exportXls.write(1, 1, "ÖDÜNÇ ALINAN KİTAPLAR");*/
 
     for(int i=0; i<colCount; i++)
-    {
-
         exportXls.write(1, i+1, model->headerData(i, Qt::Horizontal).toString(), bold);
-    }
 
     for(int i=0; i<rowCount; i++)
-    {
         for(int j=0; j<colCount; j++)
-        {
             exportXls.write(i+2, j+1, model->index(i,j).data().toString(),bordered);
-        }
-    }
 
     exportXls.currentWorksheet()->setAutoColumnWidth(1, colCount, rowCount);
-
     exportXls.addSheet("İade Edilenler");
 
     const int rcolCount = returnedModel->columnCount();
     const int rrowCount = returnedModel->rowCount();
 
     for(int i=0; i<rcolCount; i++)
-    {
-
         exportXls.write(1, i+1, returnedModel->headerData(i, Qt::Horizontal).toString(), bold);
-    }
+
 
     for(int i=0; i<rrowCount; i++)
-    {
         for(int j=0; j<rcolCount; j++)
-        {
             exportXls.write(i+2, j+1, returnedModel->index(i,j).data().toString(),bordered);
-        }
-    }
+
 
     exportXls.currentWorksheet()->setAutoColumnWidth(1, rcolCount, rrowCount);
 
@@ -553,7 +576,7 @@ void Home::on_tabWidget_currentChanged(int index)
     case 0:
         iadetab = false;
         ui->action_return->setText("İade Et");
-        ui->action_return->setIcon(QIcon(":/assets/icons/ok.png"));
+        ui->action_return->setIcon(QIcon(":/assets/icons/box-in.png"));
         ui->action_return_with_date->setEnabled(true);
         break;
 
@@ -569,19 +592,25 @@ void Home::on_tabWidget_currentChanged(int index)
 
 void Home::on_activeBooksTableView_doubleClicked(const QModelIndex &index)
 {
-    er.setRecordId(m->index(index.row(), 0).data().toInt());
-    er.show();
+
+    LoanDialog loanDlg(this, m->index(index.row(), 0).data().toInt(), schoolID);
+
+    if (loanDlg.exec() == QDialog::Accepted)
+        updateModel();
+
 }
 
 void Home::on_returnedBooksTableView_doubleClicked(const QModelIndex &index)
 {
-    er.setRecordId(rm->index(index.row(), 0).data().toInt());
-    er.show();
+    LoanDialog loanDlg(this, rm->index(index.row(), 0).data().toInt(), schoolID);
+
+    if (loanDlg.exec() == QDialog::Accepted)
+        updateReturnedModel();
 }
 
-void Home::on_actionTools_triggered()
+void Home::on_action_settings_triggered()
 {
-    tl.show();
+    tl.exec();
 }
 
 void Home::on_action_return_with_date_triggered()
@@ -599,4 +628,21 @@ void Home::on_action_return_with_date_triggered()
     rf.setIds(list);
 
     rf.show();
+}
+
+void Home::on_action_books_triggered()
+{
+    Books bk(nullptr, schoolID);
+    bk.exec();
+}
+
+void Home::on_action_print_labels_triggered()
+{
+}
+
+void Home::on_action_about_triggered()
+{
+    QMessageBox::about(this,"HiloHane Hakkında","Bu program kütüphanedeki kitap yönetimini kolaylaştıran "
+    "temel bileşenler içerir. Tüm kütüphanecilerin yararlanması için tamamen açık kaynak olarak geliştirilmiştir.<br><br>"
+    "Programın ismi sevgili hayat arkadaşım ve kütüphaneci Hilal'den geliyor.<br><br> <b>Barış Çelik</b>");
 }

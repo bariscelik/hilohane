@@ -9,5 +9,12 @@
         <file>icons/user.png</file>
         <file>icons/return.png</file>
         <file>icons/cat.png</file>
+        <file>icons/book.png</file>
+        <file>icons/box-in.png</file>
+        <file>icons/box-out.png</file>
+        <file>icons/cloud-up.png</file>
+        <file>icons/file-excel.png</file>
+        <file>icons/tag-alt.png</file>
+        <file>icons/info.png</file>
     </qresource>
 </RCC>
