@@ -82,7 +82,11 @@ void Books::on_btn_add_clicked()
 {
     BookDialog bookDlg(this,schoolID);
     if (bookDlg.exec() == QDialog::Accepted)
+    {
+        ui->tblView_booksList->sortByColumn(0);
+        ui->tblView_booksList->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
         updateModel();
+    }
 }
 
 
