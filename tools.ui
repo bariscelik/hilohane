@@ -10,12 +10,21 @@
     <height>127</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Araçlar</string>
   </property>
   <property name="windowIcon">
    <iconset resource="hilohane.qrc">
     <normaloff>:/assets/icons/cat.png</normaloff>:/assets/icons/cat.png</iconset>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
   </property>
   <property name="modal">
    <bool>true</bool>

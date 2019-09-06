@@ -141,6 +141,8 @@ void Books::on_btn_printLabels_clicked()
 
     pDlg = new QPrintPreviewDialog(writer);
 
+    pDlg->setWindowTitle("Baskı Önizleme");
+
     connect(pDlg, SIGNAL(paintRequested(QPrinter *)), this, SLOT(print(QPrinter *)));
     pDlg->open();
 }
@@ -166,7 +168,7 @@ void Books::print( QPrinter* printer )
     painter = new QPainter(printer);
 
     painter->setPen(Qt::black);
-    painter->setFont(QFont("Arial", 12));
+    painter->setFont(QFont("Arial", 12, QFont::Bold));
 
     QRect r = painter->viewport();
 
