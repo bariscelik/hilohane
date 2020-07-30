@@ -23,6 +23,10 @@ private slots:
 
     //void on_migrateDbBtn_clicked();
 
+    void on_fixFixtureBtn_triggered(QAction *arg1);
+
+    void on_fixFixtureBtn_clicked();
+
 private:
     Ui::tools *ui;
 };

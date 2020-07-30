@@ -11,7 +11,11 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QCompleter>
+#include <QList>
 #include <QMessageAuthenticationCode>
+#include <QSortFilterProxyModel>
+#include <QSqlQueryModel>
+#include <globals.h>
 
 BookDialog::BookDialog(QWidget *parent, int sc_id) :
     QDialog(parent),
@@ -70,6 +74,8 @@ BookDialog::~BookDialog()
     delete ui;
 }
 
+
+
 // ************************** //
 // **** DEWEY CATEGORIES **** //
 // ************************** //
@@ -84,7 +90,11 @@ void BookDialog::getInputs()
         ui->comboBox_category->addItem(dewey.value(0).toString() + QString(" - ") + dewey.value(1).toString(),dewey.value(0).toInt());
 
 
-    QSqlQuery books("SELECT title, author, publisher, (SELECT MAX(fixture) FROM books) AS max_fixture FROM books");
+    QSqlQuery books;
+    books.prepare("SELECT title, author, publisher, (SELECT MAX(fixture) FROM books WHERE school_id = :sc_id) AS max_fixture FROM books WHERE school_id = :sc_id");
+    books.bindValue(":sc_id", schoolID);
+    books.exec();
+
     QStringList bookTitles, bookAuthors, bookPublishers;
     QString tempValue;
 
@@ -102,6 +112,10 @@ void BookDialog::getInputs()
         if(!bookPublishers.contains(tempValue))
             bookPublishers << tempValue;
     }
+
+    sortUnicode(bookTitles);
+    sortUnicode(bookAuthors);
+    sortUnicode(bookPublishers);
 
     books.first();
 

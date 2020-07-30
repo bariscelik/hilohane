@@ -86,6 +86,8 @@ void Books::on_btn_add_clicked()
         ui->tblView_booksList->sortByColumn(0);
         ui->tblView_booksList->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
         updateModel();
+        ui->tblView_booksList->scrollToBottom();
+        ui->tblView_booksList->selectRow(pModel->rowCount()-1);
     }
 }
 

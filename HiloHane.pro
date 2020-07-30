@@ -11,10 +11,8 @@ install_db.path  = $$OUT_PWD
 
 INSTALLS += install_db
 
-
 include($$PWD/QtXlsxWriter/src/xlsx/qtxlsx.pri)
 
-LIBS += -lsqlite3
 
 SOURCES +=  main.cpp\
             home.cpp \
@@ -29,6 +27,7 @@ SOURCES +=  main.cpp\
     studentdialog.cpp
 
 HEADERS  += home.h \
+    globals.h \
             initdatabase.h \
     loandialog.h \
             students.h \
@@ -56,10 +55,3 @@ DISTFILES += \
 
 RESOURCES += \
     hilohane.qrc
-
-
-
-
-
-
-

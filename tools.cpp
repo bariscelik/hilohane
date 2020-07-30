@@ -35,6 +35,9 @@ void tools::on_deleteAllBookDataBtn_clicked()
     emit updateModel();
 }
 
+
+//UPDATE books SET fixture = fixture-3 WHERE school_id = 1 ORDER BY fixture ASC;
+
 void tools::on_increaseClassNumberBtn_clicked()
 {
     QMessageBox m(QMessageBox::Question, "Emin misiniz?", "Öğrencilerin sınıfları belirttiğiniz miktarda artırılacak ya da azaltılacaktır. Emin misiniz ? \n (VERİTABANI YEDEĞİ ALMAYI UNUTMAYIN)" , QMessageBox::Yes|QMessageBox::No);
@@ -78,5 +81,40 @@ void tools::on_increaseClassNumberBtn_clicked()
         emit updateModel();
 
     }
+
+}
+
+void tools::on_fixFixtureBtn_triggered(QAction *arg1)
+{
+
+}
+
+
+void tools::on_fixFixtureBtn_clicked()
+{
+
+
+    QSqlQuery query("SELECT bookID FROM books WHERE school_id = 2 ORDER BY fixture ASC");
+
+    if (query.lastError().isValid()) QMessageBox::critical(0,"Hata",query.lastError().text() );
+
+
+    size_t f = 1;
+    size_t bookID = 0;
+
+    while(query.next())
+    {
+        bookID = query.record().value("bookID").toUInt();
+
+        QSqlQuery saveQuery;
+        saveQuery.prepare("UPDATE books SET fixture = :fix WHERE bookID = :id");
+        saveQuery.bindValue(":id", QVariant::fromValue(bookID));
+        saveQuery.bindValue(":fix", QVariant::fromValue(f));
+        saveQuery.exec();
+        f++;
+    }
+
+
+        emit updateModel();
 
 }

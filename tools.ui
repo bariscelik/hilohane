@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
-    <height>127</height>
+    <width>257</width>
+    <height>184</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -76,6 +76,26 @@
    </property>
    <property name="text">
     <string>SINIF EKLE</string>
+   </property>
+   <property name="icon">
+    <iconset resource="hilohane.qrc">
+     <normaloff>:/assets/icons/ok.png</normaloff>:/assets/icons/ok.png</iconset>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="fixFixtureBtn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>130</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>DEMİRBAŞ DÜZELT</string>
    </property>
    <property name="icon">
     <iconset resource="hilohane.qrc">

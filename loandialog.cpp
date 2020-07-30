@@ -77,7 +77,7 @@ void LoanDialog::loadValues()
 {
 
     QSqlQuery bq;
-    bq.prepare("SELECT bookID, title, author FROM books WHERE school_id = :sc_id");
+    bq.prepare("SELECT bookID, title, author FROM books WHERE school_id = :sc_id ORDER BY title COLLATE BINARY ASC");
     bq.bindValue(":sc_id", schoolID);
     bq.exec();
 
